@@ -1,3 +1,3 @@
-module laliluna.de/expectations
+module github.com/laliluna/expectations
 
 go 1.11

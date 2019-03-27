@@ -9,7 +9,7 @@ The API is heavily inspired by http://joel-costigliola.github.io/assertj/
 ```go
 import (
 	"testing"
-	"laliluna.de/expectations"
+	"github.com/laliluna/expectations"
 )
 
 func TestDemo(t *testing.T) {
