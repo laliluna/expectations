@@ -7,11 +7,12 @@ import (
 	"strings"
 )
 
-// FailFunction expects to be a testing.T in your code but is used to allow testing our own code with a mock
+// FailFunction is normally an instance of testing.T
 type FailFunction interface {
 	Fail()
 }
 
+// Logger prints out the validation failures
 type Logger interface {
 	Log(message string)
 }
@@ -23,14 +24,8 @@ func (defaultLogger) Log(message string) {
 	fmt.Println(message)
 }
 
-// Expectation holds the actual value and is linked to methods allowing to compare it with the expected value
-type Expectation struct {
-	T      FailFunction
-	Logger Logger
-	Value  interface{}
-	failed bool
-}
-
+// Et is a component containing the testing.T of go.
+// To create it use the NewT() function
 type Et struct {
 	T      FailFunction
 	Logger Logger
@@ -44,6 +39,14 @@ func NewT(t FailFunction) Et {
 // NewTWithLogger creates a struct containing a reference to the testing.T and custome Logger
 func NewTWithLogger(t FailFunction, l Logger) Et {
 	return Et{T: t, Logger: l}
+}
+
+// Expectation holds the actual value and is linked to methods allowing to compare it with the expected value
+type Expectation struct {
+	T      FailFunction
+	Logger Logger
+	Value  interface{}
+	failed bool
 }
 
 // Expect builds an Expectation which allows to compare the value to expected values

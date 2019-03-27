@@ -10,8 +10,9 @@ import (
 	"laliluna.de/expectations"
 )
 
-func TestUsageDemo(t *testing.T) {
+func TestDemo(t *testing.T) {
 	eT := expectations.NewT(t)
+
 	eT.Expect(5).Equals(5)
 	eT.Expect(5).DoesNotEqual(1)
 	eT.Expect(5).ToBeGreater(4)
@@ -35,7 +36,6 @@ func TestUsageDemo(t *testing.T) {
 
 	numberArray := [3]float32{1.1, 2.2, 3.3}
 	eT.ExpectSlice(numberArray).Contains(float32(1.1))
-
 }
 
 func TestSupportsBasicTypes(t *testing.T) {
