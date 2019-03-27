@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"laliluna.de/expectations"
+	"github.com/laliluna/expectations"
 )
 
 func TestDemo(t *testing.T) {
