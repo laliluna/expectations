@@ -4,6 +4,8 @@ A small library to validate data in tests and print expressive fail messages.
 
 The API is heavily inspired by http://joel-costigliola.github.io/assertj/
 
+https://travis-ci.org/laliluna/expectations.svg?branch=master
+
 ## Introduction
 
 ```go
