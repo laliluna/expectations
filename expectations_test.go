@@ -13,63 +13,64 @@ import (
 func TestDemo(t *testing.T) {
 	eT := expectations.NewT(t)
 
-	eT.Expect(5).Equals(5)
-	eT.Expect(5).DoesNotEqual(1)
-	eT.Expect(5).ToBeGreater(4)
-	eT.Expect(5).ToBeGreaterOrEqual(4)
-	eT.Expect(5).ToBeLower(7)
-	eT.Expect(5).ToBeLowerOrEqual(5)
+	eT.ExpectThat(5).Equals(5)
+	eT.ExpectThat(5).IsGreater(4)
+	eT.ExpectThat(5).DoesNotEqual(1)
+	eT.ExpectThat(5).IsGreater(4)
+	eT.ExpectThat(5).IsGreaterOrEqual(4)
+	eT.ExpectThat(5).IsLower(7)
+	eT.ExpectThat(5).IsLowerOrEqual(5)
 
-	eT.Expect(5).ToBeGreater(2).ToBeLower(7)
+	eT.ExpectThat(5).IsGreater(2).IsLower(7)
 
-	eT.ExpectString("Hello World").Equals("Hello World")
-	eT.ExpectString("Hello World").EqualsIgnoringCase("hello world")
-	eT.ExpectString("Hello World").DoesNotEqual("Bye World")
-	eT.ExpectString("Hello World").Contains("Hello")
-	eT.ExpectString("Hello World").StartsWith("Hello")
-	eT.ExpectString("Hello World").EndsWith("World")
-	eT.ExpectString("Hello World").DoesNotContain("John", "Doe")
+	eT.ExpectThat("Hello World").String().Equals("Hello World")
+	eT.ExpectThat("Hello World").String().EqualsIgnoringCase("hello world")
+	eT.ExpectThat("Hello World").String().DoesNotEqual("Bye World")
+	eT.ExpectThat("Hello World").String().Contains("Hello")
+	eT.ExpectThat("Hello World").String().StartsWith("Hello")
+	eT.ExpectThat("Hello World").String().EndsWith("World")
+	eT.ExpectThat("Hello World").String().DoesNotContain("John", "Doe")
 
 	numbers := []float32{1.1, 2.2, 3.3}
-	eT.ExpectSlice(numbers).Contains(float32(1.1), float32(3.3))
-	eT.ExpectSlice(numbers).DoesNotContain(float64(1.1), float32(1.22), float32(3.22))
+	eT.ExpectThat(numbers).Slice().Contains(float32(1.1), float32(3.3))
+	eT.ExpectThat(numbers).Slice().DoesNotContain(float64(1.1), float32(1.22), float32(3.22))
 
 	numberArray := [3]float32{1.1, 2.2, 3.3}
-	eT.ExpectSlice(numberArray).Contains(float32(1.1))
+	eT.ExpectThat(numberArray).Slice().Contains(float32(1.1))
 }
 
 func TestSupportsBasicTypes(t *testing.T) {
 	eT := expectations.NewT(t)
 
 	var i int = 5
-	eT.Expect(i).ToBeGreater(i - 1)
+	eT.ExpectThat(i).IsGreater(i - 1)
 	var i8 int8 = 5
-	eT.Expect(i8).ToBeGreater(i8 - 1)
+	eT.ExpectThat(i8).IsGreater(i8 - 1)
 	var i16 int16 = 5
-	eT.Expect(i16).ToBeGreater(i16 - 1)
+	eT.ExpectThat(i16).IsGreater(i16 - 1)
 	var i32 int32 = 5
-	eT.Expect(i32).ToBeGreater(i32 - 1)
+	eT.ExpectThat(i32).IsGreater(i32 - 1)
 	var i64 int64 = 5
-	eT.Expect(i64).ToBeGreater(i64 - 1)
+	eT.ExpectThat(i64).IsGreater(i64 - 1)
 	var u uint = 5
-	eT.Expect(u).ToBeGreater(u - 1)
+	eT.ExpectThat(u).IsGreater(u - 1)
 	var up uintptr = 5
-	eT.Expect(up).ToBeGreater(up - 1)
+	eT.ExpectThat(up).IsGreater(up - 1)
 	var b byte = 5
-	eT.Expect(b).ToBeGreater(b - 1)
+	eT.ExpectThat(b).IsGreater(b - 1)
 	var r rune = 5
-	eT.Expect(r).ToBeGreater(r - 1)
+	eT.ExpectThat(r).IsGreater(r - 1)
 	var f32 float32 = 5
-	eT.Expect(f32).ToBeGreater(f32 - 1)
+	eT.ExpectThat(f32).IsGreater(f32 - 1)
 	var f64 float64 = 5
-	eT.Expect(f64).ToBeGreater(f64 - 1)
+	eT.ExpectThat(f64).IsGreater(f64 - 1)
 	var c64 complex64 = 5
-	eT.Expect(c64).Equals(c64)
+	eT.ExpectThat(c64).Equals(c64)
 	var c128 complex128 = 5
-	eT.Expect(c128).Equals(c128)
+	eT.ExpectThat(c128).Equals(c128)
 	var sLong string = "foo"
 	var sShort string = "fo"
-	eT.Expect(sLong).ToBeGreater(sShort)
+	eT.ExpectThat(sLong).IsGreater(sShort)
 }
 
 type NumberTestCase struct {
@@ -82,7 +83,7 @@ func TestIntegerExpectations(t *testing.T) {
 	tMock := &TMock{}
 	eT := expectations.NewT(tMock)
 	actualValue := 2
-	expect := eT.Expect(actualValue)
+	expect := eT.ExpectThat(actualValue)
 
 	testCases := []NumberTestCase{
 		NumberTestCase{expect.Equals, 2, true},
@@ -93,17 +94,17 @@ func TestIntegerExpectations(t *testing.T) {
 		NumberTestCase{expect.DoesNotEqual, 2, false},
 		NumberTestCase{expect.DoesNotEqual, nil, true},
 		NumberTestCase{expect.DoesNotEqual, "foo", true},
-		NumberTestCase{expect.ToBeGreater, 1, true},
-		NumberTestCase{expect.ToBeGreater, 2, false},
-		NumberTestCase{expect.ToBeGreater, 1.2, false},
-		NumberTestCase{expect.ToBeGreaterOrEqual, 1, true},
-		NumberTestCase{expect.ToBeGreaterOrEqual, 2, true},
-		NumberTestCase{expect.ToBeGreaterOrEqual, 3, false},
-		NumberTestCase{expect.ToBeLower, 3, true},
-		NumberTestCase{expect.ToBeLower, 2, false},
-		NumberTestCase{expect.ToBeLowerOrEqual, 3, true},
-		NumberTestCase{expect.ToBeLowerOrEqual, 2, true},
-		NumberTestCase{expect.ToBeLowerOrEqual, 1, false},
+		NumberTestCase{expect.IsGreater, 1, true},
+		NumberTestCase{expect.IsGreater, 2, false},
+		NumberTestCase{expect.IsGreater, 1.2, false},
+		NumberTestCase{expect.IsGreaterOrEqual, 1, true},
+		NumberTestCase{expect.IsGreaterOrEqual, 2, true},
+		NumberTestCase{expect.IsGreaterOrEqual, 3, false},
+		NumberTestCase{expect.IsLower, 3, true},
+		NumberTestCase{expect.IsLower, 2, false},
+		NumberTestCase{expect.IsLowerOrEqual, 3, true},
+		NumberTestCase{expect.IsLowerOrEqual, 2, true},
+		NumberTestCase{expect.IsLowerOrEqual, 1, false},
 	}
 
 	for _, testCase := range testCases {
@@ -120,7 +121,7 @@ func TestFloatExpectations(t *testing.T) {
 	tMock := &TMock{}
 	eT := expectations.NewT(tMock)
 	actualValue := 2.2
-	expect := eT.Expect(actualValue)
+	expect := eT.ExpectThat(actualValue)
 
 	testCases := []NumberTestCase{
 		NumberTestCase{expect.Equals, 2.2, true},
@@ -131,17 +132,17 @@ func TestFloatExpectations(t *testing.T) {
 		NumberTestCase{expect.DoesNotEqual, 2.2, false},
 		NumberTestCase{expect.DoesNotEqual, nil, true},
 		NumberTestCase{expect.DoesNotEqual, "foo", true},
-		NumberTestCase{expect.ToBeGreater, 1.0, true},
-		NumberTestCase{expect.ToBeGreater, 2.2, false},
-		NumberTestCase{expect.ToBeGreater, 3.2, false},
-		NumberTestCase{expect.ToBeGreaterOrEqual, 1.0, true},
-		NumberTestCase{expect.ToBeGreaterOrEqual, 2.2, true},
-		NumberTestCase{expect.ToBeGreaterOrEqual, 3.0, false},
-		NumberTestCase{expect.ToBeLower, 3.0, true},
-		NumberTestCase{expect.ToBeLower, 2.0, false},
-		NumberTestCase{expect.ToBeLowerOrEqual, 3.0, true},
-		NumberTestCase{expect.ToBeLowerOrEqual, 2.2, true},
-		NumberTestCase{expect.ToBeLowerOrEqual, 1.0, false},
+		NumberTestCase{expect.IsGreater, 1.0, true},
+		NumberTestCase{expect.IsGreater, 2.2, false},
+		NumberTestCase{expect.IsGreater, 3.2, false},
+		NumberTestCase{expect.IsGreaterOrEqual, 1.0, true},
+		NumberTestCase{expect.IsGreaterOrEqual, 2.2, true},
+		NumberTestCase{expect.IsGreaterOrEqual, 3.0, false},
+		NumberTestCase{expect.IsLower, 3.0, true},
+		NumberTestCase{expect.IsLower, 2.0, false},
+		NumberTestCase{expect.IsLowerOrEqual, 3.0, true},
+		NumberTestCase{expect.IsLowerOrEqual, 2.2, true},
+		NumberTestCase{expect.IsLowerOrEqual, 1.0, false},
 	}
 
 	for _, testCase := range testCases {
@@ -165,7 +166,12 @@ func TestStringExpectations(t *testing.T) {
 	tMock := &TMock{}
 	et := expectations.NewT(tMock)
 	actualValue := "FooBoo"
-	expect := et.ExpectString(actualValue)
+	expect := et.ExpectThat(actualValue).String()
+
+	et.ExpectThat(5).String()
+	if !tMock.HasBeenCalled {
+		t.Errorf("Expect String to fail if value is not a string")
+	}
 
 	testCases := []StringTestCase{
 		StringTestCase{expect.Equals, actualValue, true},
@@ -206,7 +212,7 @@ func TestStringContainsExpectations(t *testing.T) {
 	tMock := &TMock{}
 	et := expectations.NewT(tMock)
 	actualValue := "FooBoo"
-	expect := et.ExpectString(actualValue)
+	expect := et.ExpectThat(actualValue).String()
 
 	testCases := []StringArrayTestCase{
 		StringArrayTestCase{expect.Contains, []string{"oo", "ooBo"}, true},
@@ -237,7 +243,7 @@ func TestSliceExpectations(t *testing.T) {
 	tMock := &TMock{}
 	et := expectations.NewT(tMock)
 	actualValue := []int{1, 2, 3}
-	expect := et.ExpectSlice(actualValue)
+	expect := et.ExpectThat(actualValue).Slice()
 
 	testCases := []ArrayTestCase{
 		ArrayTestCase{expect.Contains, []interface{}{1, 3}, true},
@@ -271,7 +277,7 @@ func TestStopOnFirstFailure(t *testing.T) {
 
 	loggerMock := LoggerMock{}
 	et := expectations.NewTWithLogger(tMock, &loggerMock)
-	et.Expect(2).Equals(3).ToBeLower(1)
+	et.ExpectThat(2).Equals(3).IsLower(1)
 	if !strings.Contains(loggerMock.logs, "to equal") {
 		t.Errorf("Expected '%v' should contain 'to equal'", loggerMock.logs)
 	}

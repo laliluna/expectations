@@ -50,7 +50,7 @@ type Expectation struct {
 }
 
 // Expect builds an Expectation which allows to compare the value to expected values
-func (aEt *Et) Expect(value interface{}) *Expectation {
+func (aEt *Et) ExpectThat(value interface{}) *Expectation {
 	return &Expectation{aEt.T, aEt.Logger, value, false}
 }
 
@@ -83,54 +83,54 @@ func (e *Expectation) DoesNotEqual(expected interface{}) *Expectation {
 	return e
 }
 
-// ToBeGreater fails test if expected is not greater than value
-func (e *Expectation) ToBeGreater(referencedValue interface{}) *Expectation {
+// IsGreater fails test if expected is not greater than value
+func (e *Expectation) IsGreater(referencedValue interface{}) *Expectation {
 	if e.failed {
 		return e
 	}
 	result := doCompare(referencedValue, e.Value)
 	if result != greater {
 		e.failed = true
-		fail(e.T, e.Logger, buildFailMessage2("Expect %v to be greater than %v", result == notComparable, e.Value, referencedValue))
+		fail(e.T, e.Logger, buildFailMessage("Expect %v to be greater than %v", result == notComparable, e.Value, referencedValue))
 	}
 	return e
 }
 
-// ToBeGreaterOrEqual fails test if expected is not greater than or equal to value
-func (e *Expectation) ToBeGreaterOrEqual(referencedValue interface{}) *Expectation {
+// IsGreaterOrEqual fails test if expected is not greater than or equal to value
+func (e *Expectation) IsGreaterOrEqual(referencedValue interface{}) *Expectation {
 	if e.failed {
 		return e
 	}
 	result := doCompare(referencedValue, e.Value)
 	if result != greater && result != equal {
 		e.failed = true
-		fail(e.T, e.Logger, buildFailMessage2("Expect %v to be greater than or equal to %v", result == notComparable, e.Value, referencedValue))
+		fail(e.T, e.Logger, buildFailMessage("Expect %v to be greater than or equal to %v", result == notComparable, e.Value, referencedValue))
 	}
 	return e
 }
 
-// ToBeLower fails test if expected is not lower than referencedValue
-func (e *Expectation) ToBeLower(referencedValue interface{}) *Expectation {
+// IsLower fails test if expected is not lower than referencedValue
+func (e *Expectation) IsLower(referencedValue interface{}) *Expectation {
 	if e.failed {
 		return e
 	}
 	result := doCompare(referencedValue, e.Value)
 	if result != lower {
 		e.failed = true
-		fail(e.T, e.Logger, buildFailMessage2("Expect %v to be lower than %v", result == notComparable, e.Value, referencedValue))
+		fail(e.T, e.Logger, buildFailMessage("Expect %v to be lower than %v", result == notComparable, e.Value, referencedValue))
 	}
 	return e
 }
 
-// ToBeLowerOrEqual fails test if expected is not lower than or equal to referencedValue
-func (e *Expectation) ToBeLowerOrEqual(referencedValue interface{}) *Expectation {
+// IsLowerOrEqual fails test if expected is not lower than or equal to referencedValue
+func (e *Expectation) IsLowerOrEqual(referencedValue interface{}) *Expectation {
 	if e.failed {
 		return e
 	}
 	result := doCompare(referencedValue, e.Value)
 	if result != lower && result != equal {
 		e.failed = true
-		fail(e.T, e.Logger, buildFailMessage2("Expect %v to be lower than or equal to %v", result == notComparable, e.Value, referencedValue))
+		fail(e.T, e.Logger, buildFailMessage("Expect %v to be lower than or equal to %v", result == notComparable, e.Value, referencedValue))
 	}
 	return e
 }
@@ -139,107 +139,108 @@ func (e *Expectation) ToBeLowerOrEqual(referencedValue interface{}) *Expectation
 
 // StringExpectation allows to express expectations on strings
 type StringExpectation struct {
-	T      FailFunction
-	Logger Logger
-	Value  interface{}
-	failed bool
+	E *Expectation
 }
 
-// ExpectString builds an Expectation for strings which allows to compare the value to expected values
-func (aEt *Et) ExpectString(value interface{}) *StringExpectation {
-	return &StringExpectation{aEt.T, aEt.Logger, value, false}
+// String builds an Expectation for strings
+func (e *Expectation) String() *StringExpectation {
+	_, valueOk := e.Value.(string)
+	if !valueOk {
+		fail(e.T, e.Logger, buildFailMessage("Expect %v to be a string", true, e.Value))
+	}
+	return &StringExpectation{e}
 }
 
 // Reset sets the failed flag to false so that further expectations can be executed
 func (e *StringExpectation) Reset() {
-	e.failed = false
+	e.E.failed = false
 }
 
 // Equals fails test if expected is not equal to value
 func (e *StringExpectation) Equals(expected interface{}) *StringExpectation {
-	if e.failed {
+	if e.E.failed {
 		return e
 	}
-	result := compareEquality(expected, e.Value)
+	result := compareEquality(expected, e.E.Value)
 	if result != equal {
-		e.failed = true
-		fail(e.T, e.Logger, buildFailMessage2("Expect %v to equal %v", result == notComparable, e.Value, expected))
+		e.E.failed = true
+		fail(e.E.T, e.E.Logger, buildFailMessage("Expect %v to equal %v", result == notComparable, e.E.Value, expected))
 	}
 	return e
 }
 
 // EqualsIgnoringCase fails test if expected is not equal to value
 func (e *StringExpectation) EqualsIgnoringCase(expected interface{}) *StringExpectation {
-	if e.failed {
+	if e.E.failed {
 		return e
 	}
-	valueString, valueOk := e.Value.(string)
+	valueString, valueOk := e.E.Value.(string)
 	expectedString, expectedOk := expected.(string)
 	if !(valueOk && expectedOk) {
-		e.failed = true
-		fail(e.T, e.Logger, buildFailMessage2("Expect %v to equal ignoring case %v", showTypeInfos, e.Value, expected))
+		e.E.failed = true
+		fail(e.E.T, e.E.Logger, buildFailMessage("Expect %v to equal ignoring case %v", showTypeInfos, e.E.Value, expected))
 	} else if strings.ToLower(valueString) != strings.ToLower(expectedString) {
-		e.failed = true
-		fail(e.T, e.Logger, buildFailMessage2("Expect %v to equal ignoring case %v", hideTypeInfos, e.Value, expected))
+		e.E.failed = true
+		fail(e.E.T, e.E.Logger, buildFailMessage("Expect %v to equal ignoring case %v", hideTypeInfos, e.E.Value, expected))
 	}
 	return e
 }
 
 // DoesNotEqual fails test if expected is equal to value
 func (e *StringExpectation) DoesNotEqual(expected interface{}) *StringExpectation {
-	if e.failed {
+	if e.E.failed {
 		return e
 	}
-	if expected == e.Value {
-		e.failed = true
-		fail(e.T, e.Logger, buildFailMessage2("Expect %v to not equal %v", hideTypeInfos, e.Value, expected))
+	if expected == e.E.Value {
+		e.E.failed = true
+		fail(e.E.T, e.E.Logger, buildFailMessage("Expect %v to not equal %v", hideTypeInfos, e.E.Value, expected))
 	}
 	return e
 }
 
 // StartsWith checks if expected starts with value
 func (e *StringExpectation) StartsWith(prefix interface{}) *StringExpectation {
-	if e.failed {
+	if e.E.failed {
 		return e
 	}
-	valueString, valueOk := e.Value.(string)
+	valueString, valueOk := e.E.Value.(string)
 	prefixString, prefixOk := prefix.(string)
 	if !(valueOk && prefixOk) {
-		e.failed = true
-		fail(e.T, e.Logger, buildFailMessage2("Expect %v to start with %v", showTypeInfos, e.Value, prefix))
+		e.E.failed = true
+		fail(e.E.T, e.E.Logger, buildFailMessage("Expect %v to start with %v", showTypeInfos, e.E.Value, prefix))
 	} else if !strings.HasPrefix(valueString, prefixString) {
-		e.failed = true
-		fail(e.T, e.Logger, buildFailMessage2("Expect %v to start with %v", hideTypeInfos, e.Value, prefix))
+		e.E.failed = true
+		fail(e.E.T, e.E.Logger, buildFailMessage("Expect %v to start with %v", hideTypeInfos, e.E.Value, prefix))
 	}
 	return e
 }
 
 // EndsWith checks if expected starts with value
 func (e *StringExpectation) EndsWith(suffix interface{}) *StringExpectation {
-	if e.failed {
+	if e.E.failed {
 		return e
 	}
-	valueString, valueOk := e.Value.(string)
+	valueString, valueOk := e.E.Value.(string)
 	suffixString, suffixOk := suffix.(string)
 	if !(valueOk && suffixOk) {
-		e.failed = true
-		fail(e.T, e.Logger, buildFailMessage2("Expect %v to end with %v", showTypeInfos, e.Value, suffix))
+		e.E.failed = true
+		fail(e.E.T, e.E.Logger, buildFailMessage("Expect %v to end with %v", showTypeInfos, e.E.Value, suffix))
 	} else if !strings.HasSuffix(valueString, suffixString) {
-		e.failed = true
-		fail(e.T, e.Logger, buildFailMessage2("Expect %v to end with %v", hideTypeInfos, e.Value, suffix))
+		e.E.failed = true
+		fail(e.E.T, e.E.Logger, buildFailMessage("Expect %v to end with %v", hideTypeInfos, e.E.Value, suffix))
 	}
 	return e
 }
 
 // Contains checks if expected contains all expected values
 func (e *StringExpectation) Contains(expectedValues ...string) *StringExpectation {
-	if e.failed {
+	if e.E.failed {
 		return e
 	}
-	valueString, valueOk := e.Value.(string)
+	valueString, valueOk := e.E.Value.(string)
 	if !(valueOk) {
-		e.failed = true
-		fail(e.T, e.Logger, buildFailMessage2("Expect %v to contain %v", showTypeInfos, e.Value, expectedValues))
+		e.E.failed = true
+		fail(e.E.T, e.E.Logger, buildFailMessage("Expect %v to contain %v", showTypeInfos, e.E.Value, expectedValues))
 		return e
 	}
 
@@ -253,8 +254,8 @@ func (e *StringExpectation) Contains(expectedValues ...string) *StringExpectatio
 	}
 
 	if failed {
-		e.failed = true
-		fail(e.T, e.Logger, buildFailMessage2("Expect %v to contain %v but was missing %v", hideTypeInfos, e.Value, expectedValues, lackingValues))
+		e.E.failed = true
+		fail(e.E.T, e.E.Logger, buildFailMessage("Expect %v to contain %v but was missing %v", hideTypeInfos, e.E.Value, expectedValues, lackingValues))
 	}
 
 	return e
@@ -262,12 +263,12 @@ func (e *StringExpectation) Contains(expectedValues ...string) *StringExpectatio
 
 // DoesNotContain checks if expected does not contain any of the expected values
 func (e *StringExpectation) DoesNotContain(expectedValues ...string) *StringExpectation {
-	if e.failed {
+	if e.E.failed {
 		return e
 	}
-	valueString, valueOk := e.Value.(string)
+	valueString, valueOk := e.E.Value.(string)
 	if !(valueOk) {
-		fail(e.T, e.Logger, buildFailMessage2("Expect %v to not contain %v", showTypeInfos, e.Value, expectedValues))
+		fail(e.E.T, e.E.Logger, buildFailMessage("Expect %v to not contain %v", showTypeInfos, e.E.Value, expectedValues))
 		return e
 	}
 
@@ -281,8 +282,8 @@ func (e *StringExpectation) DoesNotContain(expectedValues ...string) *StringExpe
 	}
 
 	if failed {
-		e.failed = true
-		fail(e.T, e.Logger, buildFailMessage2("Expect %v to not contain %v but it includes %v", hideTypeInfos, e.Value, expectedValues, foundValues))
+		e.E.failed = true
+		fail(e.E.T, e.E.Logger, buildFailMessage("Expect %v to not contain %v but it includes %v", hideTypeInfos, e.E.Value, expectedValues, foundValues))
 	}
 
 	return e
@@ -292,74 +293,71 @@ func (e *StringExpectation) DoesNotContain(expectedValues ...string) *StringExpe
 
 // SliceExpectation allows to express expectations on strings
 type SliceExpectation struct {
-	T      FailFunction
-	Logger Logger
-	Value  interface{}
-	failed bool
+	E *Expectation
 }
 
 // ExpectSlice builds an Expectation for slices which allows to compare the value to expected values
-func (aEt *Et) ExpectSlice(value interface{}) *SliceExpectation {
-	return &SliceExpectation{aEt.T, aEt.Logger, value, false}
+func (e *Expectation) Slice() *SliceExpectation {
+	return &SliceExpectation{e}
 }
 
 // Reset sets the failed flag to false, so that further checks can be executed
 func (e *SliceExpectation) Reset() {
-	e.failed = false
+	e.E.failed = false
 }
 
 // Contains checks if expected contains all expected values
 func (e *SliceExpectation) Contains(expectedValues ...interface{}) *SliceExpectation {
-	if e.failed {
+	if e.E.failed {
 		return e
 	}
-	kind := reflect.TypeOf(e.Value).Kind()
+	kind := reflect.TypeOf(e.E.Value).Kind()
 	if !(kind == reflect.Slice || kind == reflect.Array) {
-		e.failed = true
-		fail(e.T, e.Logger, fmt.Sprintf("Expect %v %T to be a slice", e.Value, e.Value))
+		e.E.failed = true
+		fail(e.E.T, e.E.Logger, fmt.Sprintf("Expect %v %T to be a slice", e.E.Value, e.E.Value))
 		return e
 	}
 
-	typesMatch := checkTypesMatch(toSlice(e.Value), expectedValues)
+	typesMatch := checkTypesMatch(toSlice(e.E.Value), expectedValues)
 
 	var lackingValues []interface{}
 	for _, expectedValue := range expectedValues {
-		if !doContain(e.Value, expectedValue) {
+		if !doContain(e.E.Value, expectedValue) {
 			lackingValues = append(lackingValues, expectedValue)
 		}
 	}
 
 	if len(lackingValues) > 0 {
-		e.failed = true
-		fail(e.T, e.Logger, buildFailMessage2("Expect %v to contain %v but was missing %v", typesMatch, e.Value, expectedValues, lackingValues))
+		e.E.failed = true
+		fail(e.E.T, e.E.Logger, buildFailMessage("Expect %v to contain %v but was missing %v", typesMatch, e.E.Value, expectedValues, lackingValues))
 	}
 	return e
 }
 
 // DoesNotContain checks if expected does not contain any of the expected values
 func (e *SliceExpectation) DoesNotContain(expectedValues ...interface{}) *SliceExpectation {
-	if e.failed {
+	if e.E.failed {
 		return e
 	}
 
-	if reflect.TypeOf(e.Value).Kind() != reflect.Slice {
-		e.failed = true
-		fail(e.T, e.Logger, fmt.Sprintf("Expect %v %T to be a slice", e.Value, e.Value))
+	if reflect.TypeOf(e.E.Value).Kind() != reflect.Slice {
+		e.E.failed = true
+		fail(e.E.T, e.E.Logger, fmt.Sprintf("Expect %v %T to be a slice", e.E.Value, e.E.Value))
 		return e
 	}
 
-	typesMatch := checkTypesMatch(toSlice(e.Value), expectedValues)
+	typesMatch := checkTypesMatch(toSlice(e.E.Value), expectedValues)
 
 	var additionalValues []interface{}
 	for _, expectedValue := range expectedValues {
-		if doContain(e.Value, expectedValue) {
+		if doContain(e.E.Value, expectedValue) {
 			additionalValues = append(additionalValues, expectedValue)
 		}
 	}
 
 	if len(additionalValues) > 0 {
-		e.failed = true
-		fail(e.T, e.Logger, buildFailMessage2("Expect %v to not contain %v but it includes %v", typesMatch, e.Value, expectedValues, additionalValues))
+		e.E.failed = true
+		fail(e.E.T, e.E.Logger, buildFailMessage("Expect %v to not contain %v but it includes %v", typesMatch, e.E.Value, expectedValues, additionalValues))
 	}
 	return e
 }
@@ -502,15 +500,6 @@ func doCompare(expected interface{}, actual interface{}) uint {
 	return notComparable
 }
 
-func buildFailMessage(message string, actual, expected interface{}, typeOfFailure uint) string {
-	result := fmt.Sprintf(message, addTypeIfNeeded(actual, typeOfFailure), addTypeIfNeeded(expected, typeOfFailure))
-	if typeOfFailure == notComparable {
-		return "Types do not match. " + result
-	}
-
-	return result
-}
-
 func doMap(source []interface{}, fn func(interface{}) interface{}) []interface{} {
 	result := make([]interface{}, len(source))
 	for i := 0; i < len(source); i++ {
@@ -522,7 +511,7 @@ func doMap(source []interface{}, fn func(interface{}) interface{}) []interface{}
 const showTypeInfos = true
 const hideTypeInfos = true
 
-func buildFailMessage2(message string, showTypeInfos bool, args ...interface{}) string {
+func buildFailMessage(message string, showTypeInfos bool, args ...interface{}) string {
 	formattedArgs := doMap(args, func(value interface{}) interface{} {
 		if showTypeInfos {
 			return fmt.Sprintf("%v", value)
