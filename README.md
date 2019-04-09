@@ -43,7 +43,7 @@ func TestDemo(t *testing.T) {
   eT.ExpectThat(5).IsLower(7)
   eT.ExpectThat(5).IsLowerOrEqual(5)
 
-  eT.Expect(5).IsGreater(2).IsLower(7)
+  eT.ExpectThat(5).IsGreater(2).IsLower(7)
 
   eT.ExpectThat("Hello World").String().Equals("Hello World")
   eT.ExpectThat("Hello World").String().EqualsIgnoringCase("hello world")
