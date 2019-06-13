@@ -20,7 +20,12 @@ func TestDemo(t *testing.T) {
 	eT.ExpectThat(5).IsGreaterOrEqual(4)
 	eT.ExpectThat(5).IsLower(7)
 	eT.ExpectThat(5).IsLowerOrEqual(5)
+	eT.ExpectThat(nil).IsNil()
+	var foo interface{}
+	foo = 5
+	eT.ExpectThat(foo).IsNotNil()
 
+	// Chaining
 	eT.ExpectThat(5).IsGreater(2).IsLower(7)
 
 	eT.ExpectThat("Hello World").String().Equals("Hello World")
@@ -30,6 +35,7 @@ func TestDemo(t *testing.T) {
 	eT.ExpectThat("Hello World").String().StartsWith("Hello")
 	eT.ExpectThat("Hello World").String().EndsWith("World")
 	eT.ExpectThat("Hello World").String().DoesNotContain("John", "Doe")
+	eT.ExpectThat("Hello World").String().IsNotNil()
 
 	numbers := []float32{1.1, 2.2, 3.3}
 	eT.ExpectThat(numbers).Slice().Contains(float32(1.1), float32(3.3))
@@ -153,6 +159,64 @@ func TestFloatExpectations(t *testing.T) {
 		}
 		expect.Reset()
 	}
+}
+
+func TestNil(t *testing.T) {
+	tMock := &TMock{}
+	et := expectations.NewT(tMock)
+
+	et.ExpectThat("foo").IsNil()
+	if !tMock.HasBeenCalled {
+		t.Errorf("Expect 5 to be not nil")
+	}
+	tMock.reset()
+
+	et.ExpectThat(5).IsNil()
+	if !tMock.HasBeenCalled {
+		t.Errorf("Expect 5 to be not nil")
+	}
+	tMock.reset()
+
+	et.ExpectThat(nil).IsNil()
+	if tMock.HasBeenCalled {
+		t.Errorf("Expect nil to be nil")
+	}
+	tMock.reset()
+
+	et.ExpectThat("foo").String().IsNil()
+	if !tMock.HasBeenCalled {
+		t.Errorf("Expect foo to be not nil")
+	}
+	tMock.reset()
+}
+
+func TestNotNil(t *testing.T) {
+	tMock := &TMock{}
+	et := expectations.NewT(tMock)
+
+	et.ExpectThat("foo").IsNotNil()
+	if tMock.HasBeenCalled {
+		t.Errorf("Expect foo to be not nil")
+	}
+	tMock.reset()
+
+	et.ExpectThat(5).IsNotNil()
+	if tMock.HasBeenCalled {
+		t.Errorf("Expect 5 to be not nil")
+	}
+	tMock.reset()
+
+	et.ExpectThat(nil).IsNotNil()
+	if !tMock.HasBeenCalled {
+		t.Errorf("Expect nil to be nil")
+	}
+	tMock.reset()
+
+	et.ExpectThat("foo").String().IsNotNil()
+	if tMock.HasBeenCalled {
+		t.Errorf("Expect 'foo' to be not nil")
+	}
+	tMock.reset()
 }
 
 type StringTestCase struct {

@@ -122,7 +122,7 @@ func (e *Expectation) IsLower(referencedValue interface{}) *Expectation {
 	return e
 }
 
-// IsLowerOrEqual fails test if expected is not lower than or equal to referencedValue
+// IsLowerOrEqual fails test if value is not lower than or equal to referencedValue
 func (e *Expectation) IsLowerOrEqual(referencedValue interface{}) *Expectation {
 	if e.failed {
 		return e
@@ -131,6 +131,30 @@ func (e *Expectation) IsLowerOrEqual(referencedValue interface{}) *Expectation {
 	if result != lower && result != equal {
 		e.failed = true
 		fail(e.T, e.Logger, buildFailMessage("Expect %v to be lower than or equal to %v", result == notComparable, e.Value, referencedValue))
+	}
+	return e
+}
+
+// IsNil fails test if value is not nil
+func (e *Expectation) IsNil() *Expectation {
+	if e.failed {
+		return e
+	}
+	if e.Value != nil {
+		e.failed = true
+		fail(e.T, e.Logger, buildFailMessage("Expect %v to be nil", true, e.Value))
+	}
+	return e
+}
+
+// IsNotNil fails test if value is nil
+func (e *Expectation) IsNotNil() *Expectation {
+	if e.failed {
+		return e
+	}
+	if e.Value == nil {
+		e.failed = true
+		fail(e.T, e.Logger, buildFailMessage("Expect %v not to be nil", true, e.Value))
 	}
 	return e
 }
@@ -154,6 +178,18 @@ func (e *Expectation) String() *StringExpectation {
 // Reset sets the failed flag to false so that further expectations can be executed
 func (e *StringExpectation) Reset() {
 	e.E.failed = false
+}
+
+// IsNil fails test if value is not nil
+func (e *StringExpectation) IsNil() *StringExpectation {
+	e.E.IsNil()
+	return e
+}
+
+// IsNotNil fails test if value is nil
+func (e *StringExpectation) IsNotNil() *StringExpectation {
+	e.E.IsNotNil()
+	return e
 }
 
 // Equals fails test if expected is not equal to value
@@ -514,23 +550,16 @@ const hideTypeInfos = true
 func buildFailMessage(message string, showTypeInfos bool, args ...interface{}) string {
 	formattedArgs := doMap(args, func(value interface{}) interface{} {
 		if showTypeInfos {
-			return fmt.Sprintf("%v", value)
+			return addTypes(value)
 		}
-		return addTypes(value)
+		return fmt.Sprintf("%v", value)
 	})
 
 	return fmt.Sprintf(message, formattedArgs...)
 }
 
-func addTypeIfNeeded(value interface{}, typeOfFailure uint) string {
-	if typeOfFailure == notComparable {
-		return fmt.Sprintf("%v (%T)", value, value)
-	}
-	return fmt.Sprintf("%v", value)
-}
-
 func addTypes(value interface{}) string {
-	if reflect.TypeOf(value).Kind() == reflect.Slice {
+	if value != nil && reflect.TypeOf(value).Kind() == reflect.Slice {
 		result := ""
 		for _, item := range toSlice(value) {
 			if result != "" {
