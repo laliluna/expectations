@@ -17,10 +17,9 @@ import (
 func TestDemo(t *testing.T) {
   eT := expectations.NewT(t)
   eT.ExpectThat(5).IsGreater(6)
+  eT.ExpectThat("Hello World").String().EndsWith("joe")
 
-	eT.ExpectThat("Hello World").String().EndsWith("joe")
-
-	values := []int{1, 2, 3}
+  values := []int{1, 2, 3}
   eT.ExpectThat(values).Slice().Contains(1, 2, 55, 66)
 }
 ```
@@ -39,7 +38,7 @@ expectations_test.go
 
 ```go
 func TestDemo(t *testing.T) {
- eT := expectations.NewT(t)
+ 	eT := expectations.NewT(t)
 
 	eT.ExpectThat(5).Equals(5)
 	eT.ExpectThat(5).IsGreater(4)
@@ -80,6 +79,24 @@ You can chain assertions.
 eT.ExpectThat(5).DoesNotEqual(1).IsGreater(4)
 ```
 
+## Comparing different types
+
+Different types will always fail.
+
+```go
+var apple, pear interface{}
+apple = uint(5)
+pear = int(5)
+eT.ExpectThat(apple).DoesNotEqual(pear) // is not equal but we still reject the comparison
+eT.ExpectThat(apple).Equals(pear) 
+```
+```
+expectations_test.go
+--------------------
+--- TestDemo in line 15: You try to compare different types 5 (int) to 5 (uint)
+--- TestDemo in line 15: You try to compare different types 5 (int) to 5 (uint)
+
+```
 # License
 
 The code is published under [Apache License Version 2.0](LICENSE)

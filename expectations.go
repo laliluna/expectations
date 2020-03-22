@@ -59,12 +59,28 @@ func (e *Expectation) Reset() {
 	e.failed = false
 }
 
+func createMessageOnTypeMismatch(expected, actual interface{}) string {
+	if actual == nil || expected == nil {
+		return ""
+	}
+	actualType := reflect.TypeOf(actual)
+	expectedType := reflect.TypeOf(expected)
+	if expectedType != actualType {
+		return fmt.Sprintf("You try to compare different types %v(%v) - %v(%v)", actual, actualType, expected, expectedType)
+	}
+	return ""
+}
+
 // Equals fails test if expected is not equal to value
 func (e *Expectation) Equals(expected interface{}) *Expectation {
 	if e.failed {
 		return e
 	}
-	if e.Value != expected {
+
+	if msg := createMessageOnTypeMismatch(expected, e.Value); msg != "" {
+		e.failed = true
+		fail(e.T, e.Logger, msg)
+	} else if e.Value != expected {
 		e.failed = true
 		fail(e.T, e.Logger, fmt.Sprintf("Expect %v to equal %v", e.Value, expected))
 	}
@@ -76,7 +92,11 @@ func (e *Expectation) DoesNotEqual(expected interface{}) *Expectation {
 	if e.failed {
 		return e
 	}
-	if e.Value == expected {
+
+	if msg := createMessageOnTypeMismatch(expected, e.Value); msg != "" {
+		e.failed = true
+		fail(e.T, e.Logger, msg)
+	} else if e.Value == expected {
 		e.failed = true
 		fail(e.T, e.Logger, fmt.Sprintf("Expect %v to not equal %v", e.Value, expected))
 	}
@@ -88,8 +108,10 @@ func (e *Expectation) IsGreater(referencedValue interface{}) *Expectation {
 	if e.failed {
 		return e
 	}
-	result := doCompare(referencedValue, e.Value)
-	if result != greater {
+	if msg := createMessageOnTypeMismatch(referencedValue, e.Value); msg != "" {
+		e.failed = true
+		fail(e.T, e.Logger, msg)
+	} else if result := doCompare(referencedValue, e.Value); result != greater {
 		e.failed = true
 		fail(e.T, e.Logger, buildFailMessage("Expect %v to be greater than %v", result == notComparable, e.Value, referencedValue))
 	}
@@ -101,8 +123,11 @@ func (e *Expectation) IsGreaterOrEqual(referencedValue interface{}) *Expectation
 	if e.failed {
 		return e
 	}
-	result := doCompare(referencedValue, e.Value)
-	if result != greater && result != equal {
+
+	if msg := createMessageOnTypeMismatch(referencedValue, e.Value); msg != "" {
+		e.failed = true
+		fail(e.T, e.Logger, msg)
+	} else if result := doCompare(referencedValue, e.Value); result != greater && result != equal {
 		e.failed = true
 		fail(e.T, e.Logger, buildFailMessage("Expect %v to be greater than or equal to %v", result == notComparable, e.Value, referencedValue))
 	}
@@ -114,8 +139,10 @@ func (e *Expectation) IsLower(referencedValue interface{}) *Expectation {
 	if e.failed {
 		return e
 	}
-	result := doCompare(referencedValue, e.Value)
-	if result != lower {
+	if msg := createMessageOnTypeMismatch(referencedValue, e.Value); msg != "" {
+		e.failed = true
+		fail(e.T, e.Logger, msg)
+	} else if result := doCompare(referencedValue, e.Value); result != lower {
 		e.failed = true
 		fail(e.T, e.Logger, buildFailMessage("Expect %v to be lower than %v", result == notComparable, e.Value, referencedValue))
 	}
@@ -127,8 +154,10 @@ func (e *Expectation) IsLowerOrEqual(referencedValue interface{}) *Expectation {
 	if e.failed {
 		return e
 	}
-	result := doCompare(referencedValue, e.Value)
-	if result != lower && result != equal {
+	if msg := createMessageOnTypeMismatch(referencedValue, e.Value); msg != "" {
+		e.failed = true
+		fail(e.T, e.Logger, msg)
+	} else if result := doCompare(referencedValue, e.Value); result != lower && result != equal {
 		e.failed = true
 		fail(e.T, e.Logger, buildFailMessage("Expect %v to be lower than or equal to %v", result == notComparable, e.Value, referencedValue))
 	}

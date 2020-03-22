@@ -46,7 +46,7 @@ func TestDemo(t *testing.T) {
 }
 
 func TestSupportsBasicTypes(t *testing.T) {
-	eT := expectations.NewT(t)
+	eT := expectations.NewTWithLogger(t, &SilenceLoggerMock{})
 
 	var i int = 5
 	eT.ExpectThat(i).IsGreater(i - 1)
@@ -87,7 +87,7 @@ type NumberTestCase struct {
 
 func TestIntegerExpectations(t *testing.T) {
 	tMock := &TMock{}
-	eT := expectations.NewT(tMock)
+	eT := expectations.NewTWithLogger(tMock, &SilenceLoggerMock{})
 	actualValue := 2
 	expect := eT.ExpectThat(actualValue)
 
@@ -99,7 +99,7 @@ func TestIntegerExpectations(t *testing.T) {
 		NumberTestCase{expect.DoesNotEqual, 1, true},
 		NumberTestCase{expect.DoesNotEqual, 2, false},
 		NumberTestCase{expect.DoesNotEqual, nil, true},
-		NumberTestCase{expect.DoesNotEqual, "foo", true},
+		NumberTestCase{expect.DoesNotEqual, "foo", false}, // reject to compare different types
 		NumberTestCase{expect.IsGreater, 1, true},
 		NumberTestCase{expect.IsGreater, 2, false},
 		NumberTestCase{expect.IsGreater, 1.2, false},
@@ -123,9 +123,29 @@ func TestIntegerExpectations(t *testing.T) {
 	}
 }
 
+func TestShowNumbersHaveNotTheSameType(t *testing.T) {
+	tMock := &TMock{}
+
+	loggerMock := LoggerMock{}
+	et := expectations.NewTWithLogger(tMock, &loggerMock)
+
+	var actualValue uint16 = 1
+	et.ExpectThat(actualValue).Equals(1)
+	if !strings.Contains(loggerMock.logs, "You try to compare different types") {
+		t.Errorf("Expected message to indicate different types")
+	}
+
+	loggerMock.Reset()
+
+	et.ExpectThat(actualValue).DoesNotEqual(2)
+	if !strings.Contains(loggerMock.logs, "You try to compare different types") {
+		t.Errorf("Expected message to indicate different types")
+	}
+}
+
 func TestFloatExpectations(t *testing.T) {
 	tMock := &TMock{}
-	eT := expectations.NewT(tMock)
+	eT := expectations.NewTWithLogger(tMock, &SilenceLoggerMock{})
 	actualValue := 2.2
 	expect := eT.ExpectThat(actualValue)
 
@@ -137,7 +157,7 @@ func TestFloatExpectations(t *testing.T) {
 		NumberTestCase{expect.DoesNotEqual, 1.1, true},
 		NumberTestCase{expect.DoesNotEqual, 2.2, false},
 		NumberTestCase{expect.DoesNotEqual, nil, true},
-		NumberTestCase{expect.DoesNotEqual, "foo", true},
+		NumberTestCase{expect.DoesNotEqual, "foo", false}, // reject to compare type
 		NumberTestCase{expect.IsGreater, 1.0, true},
 		NumberTestCase{expect.IsGreater, 2.2, false},
 		NumberTestCase{expect.IsGreater, 3.2, false},
@@ -329,11 +349,21 @@ func TestSliceExpectations(t *testing.T) {
 	}
 }
 
+type SilenceLoggerMock struct{}
+
+func (lm *SilenceLoggerMock) Log(message string) {
+
+}
+
 type LoggerMock struct{ logs string }
 
 func (lm *LoggerMock) Log(message string) {
 	fmt.Println(message)
 	lm.logs += message
+}
+
+func (lm *LoggerMock) Reset() {
+	lm.logs = ""
 }
 
 func TestStopOnFirstFailure(t *testing.T) {
