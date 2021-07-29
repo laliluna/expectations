@@ -164,12 +164,24 @@ func (e *Expectation) IsLowerOrEqual(referencedValue interface{}) *Expectation {
 	return e
 }
 
+func IsNil(value interface{}) bool {
+	if value == nil {
+		return true
+	}
+	switch reflect.TypeOf(value).Kind() {
+	case reflect.Ptr, reflect.Map, reflect.Chan, reflect.Slice:
+		return reflect.ValueOf(value).IsNil()
+	}
+	return false
+}
+
 // IsNil fails test if value is not nil
 func (e *Expectation) IsNil() *Expectation {
 	if e.failed {
 		return e
 	}
-	if e.Value != nil {
+
+	if !IsNil(e.Value) {
 		e.failed = true
 		fail(e.T, e.Logger, buildFailMessage("Expect %v to be nil", true, e.Value))
 	}
@@ -181,7 +193,7 @@ func (e *Expectation) IsNotNil() *Expectation {
 	if e.failed {
 		return e
 	}
-	if e.Value == nil {
+	if IsNil((e.Value)) {
 		e.failed = true
 		fail(e.T, e.Logger, buildFailMessage("Expect %v not to be nil", true, e.Value))
 	}

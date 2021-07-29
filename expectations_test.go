@@ -208,8 +208,32 @@ func TestNil(t *testing.T) {
 		t.Errorf("Expect foo to be not nil")
 	}
 	tMock.reset()
+
 }
 
+func TestNilPointer(t *testing.T) {
+	et := expectations.NewT(t)
+	type data struct{}
+	var x *data
+	et.ExpectThat(x).IsNil()
+}
+
+func TestNilChannel(t *testing.T) {
+	et := expectations.NewT(t)
+	var x chan int
+	et.ExpectThat(x).IsNil()
+}
+
+func TestNilMap(t *testing.T) {
+	et := expectations.NewT(t)
+	var x map[string]int
+	et.ExpectThat(x).IsNil()
+}
+func TestNilSlice(t *testing.T) {
+	et := expectations.NewT(t)
+	var x []string
+	et.ExpectThat(x).IsNil()
+}
 func TestNotNil(t *testing.T) {
 	tMock := &TMock{}
 	et := expectations.NewT(tMock)
