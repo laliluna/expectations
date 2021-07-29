@@ -6,6 +6,12 @@ The API is heavily inspired by http://joel-costigliola.github.io/assertj/
 
 ![alt "Travis Build Status"](https://travis-ci.org/laliluna/expectations.svg?branch=master)
 
+## Installation
+
+```
+go get github.com/laliluna/expectations
+```
+
 ## Introduction
 
 ```go
