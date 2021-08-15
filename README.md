@@ -61,6 +61,7 @@ func TestDemo(t *testing.T) {
 	// Chaining
 	eT.ExpectThat(5).IsGreater(2).IsLower(7)
 
+	// Strings
 	eT.ExpectThat("Hello World").String().Equals("Hello World")
 	eT.ExpectThat("Hello World").String().EqualsIgnoringCase("hello world")
 	eT.ExpectThat("Hello World").String().DoesNotEqual("Bye World")
@@ -70,9 +71,11 @@ func TestDemo(t *testing.T) {
 	eT.ExpectThat("Hello World").String().DoesNotContain("John", "Doe")
 	eT.ExpectThat("Hello World").String().IsNotNil()
 
+	// Slices and arrays
 	numbers := []float32{1.1, 2.2, 3.3}
 	eT.ExpectThat(numbers).Slice().Contains(float32(1.1), float32(3.3))
 	eT.ExpectThat(numbers).Slice().DoesNotContain(float64(1.1), float32(1.22), float32(3.22))
+	eT.ExpectThat(numbers).Slice().IsNotEmpty() // IsEmpty
 
 	numberArray := [3]float32{1.1, 2.2, 3.3}
 	eT.ExpectThat(numberArray).Slice().Contains(float32(1.1))

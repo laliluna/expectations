@@ -439,6 +439,44 @@ func (e *SliceExpectation) DoesNotContain(expectedValues ...interface{}) *SliceE
 	return e
 }
 
+func (e *SliceExpectation) IsEmpty(expectedValues ...interface{}) *SliceExpectation {
+	if e.E.failed {
+		return e
+	}
+
+	if reflect.TypeOf(e.E.Value).Kind() != reflect.Slice {
+		e.E.failed = true
+		fail(e.E.T, e.E.Logger, fmt.Sprintf("Expect %v %T to be a slice", e.E.Value, e.E.Value))
+		return e
+	}
+
+	if len(toSlice(e.E.Value)) > 0 {
+		e.E.failed = true
+		fail(e.E.T, e.E.Logger, fmt.Sprintf("Expect %v %T to be empty", e.E.Value, e.E.Value))
+		return e
+	}
+	return e
+}
+
+func (e *SliceExpectation) IsNotEmpty(expectedValues ...interface{}) *SliceExpectation {
+	if e.E.failed {
+		return e
+	}
+
+	if reflect.TypeOf(e.E.Value).Kind() != reflect.Slice {
+		e.E.failed = true
+		fail(e.E.T, e.E.Logger, fmt.Sprintf("Expect %v %T to be a slice", e.E.Value, e.E.Value))
+		return e
+	}
+
+	if len(toSlice(e.E.Value)) == 0 {
+		e.E.failed = true
+		fail(e.E.T, e.E.Logger, fmt.Sprintf("Expect %v %T to be not empty", e.E.Value, e.E.Value))
+		return e
+	}
+	return e
+}
+
 func toSlice(value interface{}) []interface{} {
 	sourceSlice := reflect.ValueOf(value)
 	result := make([]interface{}, sourceSlice.Len(), sourceSlice.Cap())
