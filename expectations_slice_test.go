@@ -16,7 +16,7 @@ func TestSliceExpectations(t *testing.T) {
 	tMock := &TMock{}
 	et := expectations.NewT(tMock)
 	actualValue := []int{1, 2, 3}
-	expect := et.ExpectThat(actualValue).Slice()
+	expect := et.ExpectThatSlice(actualValue)
 
 	testCases := []ArrayTestCase{
 		ArrayTestCase{expect.Contains, []interface{}{1, 3}, true},
@@ -40,14 +40,14 @@ func TestSliceExpectations(t *testing.T) {
 
 func TestSliceIsEmpty(t *testing.T) {
 	et := expectations.NewT(t)
-	et.ExpectThat([]int{}).Slice().IsEmpty()
+	et.ExpectThatSlice([]int{}).IsEmpty()
 }
 
 func TestSliceIsEmptyFails(t *testing.T) {
 	tMock := &TMock{}
 	et := expectations.NewT(tMock)
 
-	et.ExpectThat([]int{1}).Slice().IsEmpty()
+	et.ExpectThatSlice([]int{1}).IsEmpty()
 	if !tMock.HasBeenCalled {
 		t.Error("Slice should not be empty")
 	}
@@ -55,15 +55,20 @@ func TestSliceIsEmptyFails(t *testing.T) {
 
 func TestSliceIsNotEmpty(t *testing.T) {
 	et := expectations.NewT(t)
-	et.ExpectThat([]int{1}).Slice().IsNotEmpty()
+	et.ExpectThatSlice([]int{1}).IsNotEmpty()
 }
 
 func TestSliceIsNotEmptyFails(t *testing.T) {
 	tMock := &TMock{}
 	et := expectations.NewT(tMock)
 
-	et.ExpectThat([]int{}).Slice().IsNotEmpty()
+	et.ExpectThatSlice([]int{}).IsNotEmpty()
 	if !tMock.HasBeenCalled {
 		t.Error("Slice should not be empty")
 	}
+}
+
+func TestDeprecatedSliceIsEmpty(t *testing.T) {
+	et := expectations.NewT(t)
+	et.ExpectThat([]int{}).Slice().IsEmpty()
 }

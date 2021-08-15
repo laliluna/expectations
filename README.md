@@ -39,12 +39,36 @@ expectations_test.go
 
 --- FAIL: TestDemo (0.00s)
 ```
+## Release notes
+
+Since 0.6 
+
+	eT.ExpectThatString("Hello World")
+
+is preferred over		
+
+	eT.ExpectThat("Hello World").String()
+
+and 
+
+	eT.ExpectThatSlice(numbers)
+
+over
+
+	eT.ExpectThat(numbers).Slice()
+
 
 ## Usage
 
 ```go
+import (
+	"testing"
+
+	"github.com/laliluna/expectations"
+)
+
 func TestDemo(t *testing.T) {
- 	eT := expectations.NewT(t)
+	eT := expectations.NewT(t)
 
 	eT.ExpectThat(5).Equals(5)
 	eT.ExpectThat(5).IsGreater(4)
@@ -61,24 +85,24 @@ func TestDemo(t *testing.T) {
 	// Chaining
 	eT.ExpectThat(5).IsGreater(2).IsLower(7)
 
-	// Strings
-	eT.ExpectThat("Hello World").String().Equals("Hello World")
-	eT.ExpectThat("Hello World").String().EqualsIgnoringCase("hello world")
-	eT.ExpectThat("Hello World").String().DoesNotEqual("Bye World")
-	eT.ExpectThat("Hello World").String().Contains("Hello")
-	eT.ExpectThat("Hello World").String().StartsWith("Hello")
-	eT.ExpectThat("Hello World").String().EndsWith("World")
-	eT.ExpectThat("Hello World").String().DoesNotContain("John", "Doe")
-	eT.ExpectThat("Hello World").String().IsNotNil()
+	// String
+	eT.ExpectThatString("Hello World").Equals("Hello World")
+	eT.ExpectThatString("Hello World").EqualsIgnoringCase("hello world")
+	eT.ExpectThatString("Hello World").DoesNotEqual("Bye World")
+	eT.ExpectThatString("Hello World").Contains("Hello")
+	eT.ExpectThatString("Hello World").StartsWith("Hello")
+	eT.ExpectThatString("Hello World").EndsWith("World")
+	eT.ExpectThatString("Hello World").DoesNotContain("John", "Doe")
+	eT.ExpectThatString("Hello World").IsNotNil()
 
 	// Slices and arrays
 	numbers := []float32{1.1, 2.2, 3.3}
-	eT.ExpectThat(numbers).Slice().Contains(float32(1.1), float32(3.3))
-	eT.ExpectThat(numbers).Slice().DoesNotContain(float64(1.1), float32(1.22), float32(3.22))
-	eT.ExpectThat(numbers).Slice().IsNotEmpty() // IsEmpty
+	eT.ExpectThatSlice(numbers).Contains(float32(1.1), float32(3.3))
+	eT.ExpectThatSlice(numbers).DoesNotContain(float64(1.1), float32(1.22), float32(3.22))
+	eT.ExpectThatSlice(numbers).IsNotEmpty() // IsEmpty
 
 	numberArray := [3]float32{1.1, 2.2, 3.3}
-	eT.ExpectThat(numberArray).Slice().Contains(float32(1.1))
+	eT.ExpectThatSlice(numberArray).Contains(float32(1.1))
 }
 ```
 

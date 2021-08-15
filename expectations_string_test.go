@@ -17,12 +17,7 @@ func TestStringExpectations(t *testing.T) {
 	tMock := &TMock{}
 	et := expectations.NewT(tMock)
 	actualValue := "FooBoo"
-	expect := et.ExpectThat(actualValue).String()
-
-	et.ExpectThat(5).String()
-	if !tMock.HasBeenCalled {
-		t.Errorf("Expect String to fail if value is not a string")
-	}
+	expect := et.ExpectThatString(actualValue)
 
 	testCases := []StringTestCase{
 		StringTestCase{expect.Equals, actualValue, true},
@@ -63,7 +58,7 @@ func TestStringContainsExpectations(t *testing.T) {
 	tMock := &TMock{}
 	et := expectations.NewT(tMock)
 	actualValue := "FooBoo"
-	expect := et.ExpectThat(actualValue).String()
+	expect := et.ExpectThatString(actualValue)
 
 	testCases := []StringArrayTestCase{
 		StringArrayTestCase{expect.Contains, []string{"oo", "ooBo"}, true},

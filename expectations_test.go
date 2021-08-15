@@ -28,21 +28,24 @@ func TestDemo(t *testing.T) {
 	// Chaining
 	eT.ExpectThat(5).IsGreater(2).IsLower(7)
 
-	eT.ExpectThat("Hello World").String().Equals("Hello World")
-	eT.ExpectThat("Hello World").String().EqualsIgnoringCase("hello world")
-	eT.ExpectThat("Hello World").String().DoesNotEqual("Bye World")
-	eT.ExpectThat("Hello World").String().Contains("Hello")
-	eT.ExpectThat("Hello World").String().StartsWith("Hello")
-	eT.ExpectThat("Hello World").String().EndsWith("World")
-	eT.ExpectThat("Hello World").String().DoesNotContain("John", "Doe")
-	eT.ExpectThat("Hello World").String().IsNotNil()
+	// String
+	eT.ExpectThatString("Hello World").Equals("Hello World")
+	eT.ExpectThatString("Hello World").EqualsIgnoringCase("hello world")
+	eT.ExpectThatString("Hello World").DoesNotEqual("Bye World")
+	eT.ExpectThatString("Hello World").Contains("Hello")
+	eT.ExpectThatString("Hello World").StartsWith("Hello")
+	eT.ExpectThatString("Hello World").EndsWith("World")
+	eT.ExpectThatString("Hello World").DoesNotContain("John", "Doe")
+	eT.ExpectThatString("Hello World").IsNotNil()
 
+	// Slices and arrays
 	numbers := []float32{1.1, 2.2, 3.3}
-	eT.ExpectThat(numbers).Slice().Contains(float32(1.1), float32(3.3))
-	eT.ExpectThat(numbers).Slice().DoesNotContain(float64(1.1), float32(1.22), float32(3.22))
+	eT.ExpectThatSlice(numbers).Contains(float32(1.1), float32(3.3))
+	eT.ExpectThatSlice(numbers).DoesNotContain(float64(1.1), float32(1.22), float32(3.22))
+	eT.ExpectThatSlice(numbers).IsNotEmpty() // IsEmpty
 
 	numberArray := [3]float32{1.1, 2.2, 3.3}
-	eT.ExpectThat(numberArray).Slice().Contains(float32(1.1))
+	eT.ExpectThatSlice(numberArray).Contains(float32(1.1))
 }
 
 func TestSupportsBasicTypes(t *testing.T) {
@@ -203,7 +206,7 @@ func TestNil(t *testing.T) {
 	}
 	tMock.reset()
 
-	et.ExpectThat("foo").String().IsNil()
+	et.ExpectThatString("foo").IsNil()
 	if !tMock.HasBeenCalled {
 		t.Errorf("Expect foo to be not nil")
 	}
@@ -256,7 +259,7 @@ func TestNotNil(t *testing.T) {
 	}
 	tMock.reset()
 
-	et.ExpectThat("foo").String().IsNotNil()
+	et.ExpectThatString("foo").IsNotNil()
 	if tMock.HasBeenCalled {
 		t.Errorf("Expect 'foo' to be not nil")
 	}

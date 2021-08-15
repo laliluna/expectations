@@ -54,6 +54,16 @@ func (aEt *Et) ExpectThat(value interface{}) *Expectation {
 	return &Expectation{aEt.T, aEt.Logger, value, false}
 }
 
+// Expect builds an Expectation which allows to compare the value to expected values
+func (aEt *Et) ExpectThatString(value string) *StringExpectation {
+	return &StringExpectation{&Expectation{aEt.T, aEt.Logger, value, false}}
+}
+
+// ExpectThatSlice builds an Expectation for slices which allows to compare the value to expected values
+func (aEt *Et) ExpectThatSlice(value interface{}) *SliceExpectation {
+	return &SliceExpectation{&Expectation{aEt.T, aEt.Logger, value, false}}
+}
+
 // Reset sets the failed flag to false so that further expectations can be executed
 func (e *Expectation) Reset() {
 	e.failed = false
@@ -208,7 +218,8 @@ type StringExpectation struct {
 }
 
 // String builds an Expectation for strings
-func (e *Expectation) String() *StringExpectation {
+// Deprecated: Use ExpectThatString instead
+func (e *Expectation) String_() *StringExpectation {
 	_, valueOk := e.Value.(string)
 	if !valueOk {
 		fail(e.T, e.Logger, buildFailMessage("Expect %v to be a string", true, e.Value))
@@ -374,6 +385,7 @@ type SliceExpectation struct {
 }
 
 // ExpectSlice builds an Expectation for slices which allows to compare the value to expected values
+// Deprecated: Use ExpectThatSlice instead
 func (e *Expectation) Slice() *SliceExpectation {
 	return &SliceExpectation{e}
 }
