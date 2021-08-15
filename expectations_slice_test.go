@@ -6,37 +6,6 @@ import (
 	"github.com/laliluna/expectations"
 )
 
-type StringArrayTestCase struct {
-	Fn            func(...string) *expectations.StringExpectation
-	ExpectedValue []string
-	Succeeds      bool
-}
-
-func TestStringContainsExpectations(t *testing.T) {
-	tMock := &TMock{}
-	et := expectations.NewT(tMock)
-	actualValue := "FooBoo"
-	expect := et.ExpectThat(actualValue).String()
-
-	testCases := []StringArrayTestCase{
-		StringArrayTestCase{expect.Contains, []string{"oo", "ooBo"}, true},
-		StringArrayTestCase{expect.Contains, []string{"oo", "x"}, false},
-		StringArrayTestCase{expect.Contains, []string{"x"}, false},
-		StringArrayTestCase{expect.DoesNotContain, []string{"ox", "obo"}, true},
-		StringArrayTestCase{expect.DoesNotContain, []string{"x", "oo"}, false},
-		StringArrayTestCase{expect.DoesNotContain, []string{"oo"}, false},
-	}
-
-	for _, testCase := range testCases {
-		tMock.reset()
-		testCase.Fn(testCase.ExpectedValue...)
-		if testCase.Succeeds == tMock.HasBeenCalled {
-			t.Errorf("Test failed: %v %v %v should be %v", actualValue, functionName(testCase.Fn), testCase.ExpectedValue, testCase.Succeeds)
-		}
-		expect.Reset()
-	}
-}
-
 type ArrayTestCase struct {
 	Fn            func(...interface{}) *expectations.SliceExpectation
 	ExpectedValue []interface{}
