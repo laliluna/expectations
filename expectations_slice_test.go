@@ -72,3 +72,13 @@ func TestDeprecatedSliceIsEmpty(t *testing.T) {
 	et := expectations.NewT(t)
 	et.ExpectThat([]int{}).Slice().IsEmpty()
 }
+
+func TestEmptySliceContainsDoesNotFail(t *testing.T) {
+	tMock := &TMock{}
+	et := expectations.NewT(tMock)
+
+	et.ExpectThatSlice([]int{}).Contains(1)
+	if !tMock.HasBeenCalled {
+		t.Error("Slice should not contain")
+	}
+}

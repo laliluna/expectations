@@ -509,6 +509,9 @@ func doContain(sliceValue, expectedValue interface{}) bool {
 }
 
 func checkTypesMatch(values, expectedValues []interface{}) bool {
+	if len(values) == 0 {
+		return true
+	}
 	valueType := reflect.TypeOf(values[0])
 	for _, expectedValue := range expectedValues {
 		if valueType != reflect.TypeOf(expectedValue) {
