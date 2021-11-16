@@ -101,6 +101,8 @@ func TestDemo(t *testing.T) {
 	eT.ExpectThatSlice(numbers).DoesNotContain(float64(1.1), float32(1.22), float32(3.22))
 	eT.ExpectThatSlice(numbers).IsNotEmpty() // IsEmpty
 
+	eT.ExpectThatSlice(numbers).HasSize(3).First().Equals(float32(1.1)) // Second | Third | Nth
+
 	numberArray := [3]float32{1.1, 2.2, 3.3}
 	eT.ExpectThatSlice(numberArray).Contains(float32(1.1))
 }

@@ -489,6 +489,56 @@ func (e *SliceExpectation) IsNotEmpty(expectedValues ...interface{}) *SliceExpec
 	return e
 }
 
+func (e *SliceExpectation) HasSize(expectedValue uint) *SliceExpectation {
+	if e.E.failed {
+		return e
+	}
+
+	if reflect.TypeOf(e.E.Value).Kind() != reflect.Slice {
+		e.E.failed = true
+		fail(e.E.T, e.E.Logger, fmt.Sprintf("Expect %v %T to be a slice", e.E.Value, e.E.Value))
+		return e
+	}
+
+	if len(toSlice(e.E.Value)) != int(expectedValue) {
+		e.E.failed = true
+		fail(e.E.T, e.E.Logger, fmt.Sprintf("Expect len of %v %T to be %v and not %v", e.E.Value, e.E.Value, expectedValue, len(toSlice(e.E.Value))))
+		return e
+	}
+	return e
+}
+
+func (e *SliceExpectation) First() *Expectation {
+	return e.Nth(0)
+}
+
+func (e *SliceExpectation) Second() *Expectation {
+	return e.Nth(1)
+}
+
+func (e *SliceExpectation) Third() *Expectation {
+	return e.Nth(2)
+}
+
+func (e *SliceExpectation) Nth(nthElement int) *Expectation {
+	if e.E.failed {
+		return e.E
+	}
+
+	if reflect.TypeOf(e.E.Value).Kind() != reflect.Slice {
+		e.E.failed = true
+		fail(e.E.T, e.E.Logger, fmt.Sprintf("Expect %v %T to be a slice", e.E.Value, e.E.Value))
+		return e.E
+	}
+	valueAsSlice := toSlice(e.E.Value)
+	if len(valueAsSlice) <= nthElement {
+		e.E.failed = true
+		fail(e.E.T, e.E.Logger, fmt.Sprintf("Expect %v %T to have at least %v elements", e.E.Value, e.E.Value, nthElement+1))
+		return e.E
+	}
+	return &Expectation{e.E.T, e.E.Logger, valueAsSlice[nthElement], false}
+}
+
 func toSlice(value interface{}) []interface{} {
 	sourceSlice := reflect.ValueOf(value)
 	result := make([]interface{}, sourceSlice.Len(), sourceSlice.Cap())
